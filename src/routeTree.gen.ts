@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HubIndexRouteImport } from './routes/hub.index'
+import { Route as HubCampaignIdRouteImport } from './routes/hub.$campaignId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,30 +23,39 @@ const HubIndexRoute = HubIndexRouteImport.update({
   path: '/hub/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HubCampaignIdRoute = HubCampaignIdRouteImport.update({
+  id: '/hub/$campaignId',
+  path: '/hub/$campaignId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/hub/$campaignId': typeof HubCampaignIdRoute
   '/hub/': typeof HubIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/hub/$campaignId': typeof HubCampaignIdRoute
   '/hub': typeof HubIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/hub/$campaignId': typeof HubCampaignIdRoute
   '/hub/': typeof HubIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/hub/'
+  fullPaths: '/' | '/hub/$campaignId' | '/hub/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/hub'
-  id: '__root__' | '/' | '/hub/'
+  to: '/' | '/hub/$campaignId' | '/hub'
+  id: '__root__' | '/' | '/hub/$campaignId' | '/hub/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HubCampaignIdRoute: typeof HubCampaignIdRoute
   HubIndexRoute: typeof HubIndexRoute
 }
 
@@ -65,11 +75,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HubIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hub/$campaignId': {
+      id: '/hub/$campaignId'
+      path: '/hub/$campaignId'
+      fullPath: '/hub/$campaignId'
+      preLoaderRoute: typeof HubCampaignIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HubCampaignIdRoute: HubCampaignIdRoute,
   HubIndexRoute: HubIndexRoute,
 }
 export const routeTree = rootRouteImport
