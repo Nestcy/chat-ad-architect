@@ -1,24 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AppShell } from "@/components/app-shell";
+import { ChatView } from "@/components/chat/chat-view";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Autopilot — Autonomous Marketing Assistant" },
+      {
+        name: "description",
+        content:
+          "Chat with an autonomous marketing agent that plans campaigns, generates ad assets, allocates budget, and publishes on schedule.",
+      },
+      { property: "og:title", content: "Autopilot — Autonomous Marketing Assistant" },
+      {
+        property: "og:description",
+        content:
+          "Launch and steer ad campaigns in natural language. Plans, creative, and publish status render inline as you chat.",
+      },
+    ],
+  }),
+  component: ChatPage,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function ChatPage() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <AppShell>
+      <ChatView />
+    </AppShell>
   );
 }
