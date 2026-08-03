@@ -1,4 +1,6 @@
-export const API_BASE_URL = "https://web-production-5ce11.up.railway.app";
+import { API_BASE_URL, API_PROXY_PREFIX } from "./api-base";
+
+export { API_BASE_URL };
 
 export type ChatRole = "user" | "assistant";
 
@@ -61,7 +63,7 @@ const GENERIC_ERROR = "Something went wrong reaching the server — try again.";
 
 async function request<T>(path: string, init?: RequestInit): Promise<ApiResult<T>> {
   try {
-    const response = await fetch(`${API_BASE_URL}${path}`, init);
+    const response = await fetch(`${API_PROXY_PREFIX}${path}`, init);
     if (!response.ok) {
       return { ok: false, error: `Server responded ${response.status}. ${GENERIC_ERROR}` };
     }
