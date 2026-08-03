@@ -83,7 +83,7 @@ function ImageGrid({
   copy,
 }: {
   images: Record<string, GeneratedImage>;
-  copy?: Record<string, string> | null;
+  copy?: Record<string, string> | null | undefined;
 }) {
   const entries = Object.entries(images);
   if (entries.length === 0) {
@@ -162,7 +162,7 @@ export function CampaignStatusPanel({ campaignId, initial, live = false, title }
 
   const status: CampaignStatus | undefined = useMemo(() => {
     if (data) return data;
-    if (initial && (initial.campaign_plan || initial.generated_images || initial.logs)) {
+    if (initial && (initial['campaign_plan'] || initial['generated_images'] || initial['logs'])) {
       return initial as unknown as CampaignStatus;
     }
     return undefined;
