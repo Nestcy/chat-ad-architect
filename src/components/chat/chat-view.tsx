@@ -56,9 +56,10 @@ export function ChatView() {
     async (text: string, history: ChatMessage[]) => {
       setPending(true);
       setFailure(null);
-      const turns: ChatTurn[] = [...history, { id: "pending", role: "user", content: text }].map(
-        (message) => ({ role: message.role, content: message.content }),
-      );
+      const turns: ChatTurn[] = [
+        ...history,
+        { id: "pending", role: "user" as const, content: text },
+      ].map((message) => ({ role: message.role, content: message.content }));
       const result = await sendChat(turns);
       setPending(false);
 
