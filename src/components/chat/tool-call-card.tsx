@@ -31,7 +31,9 @@ export function ToolCallCard({
   const campaignId = typeof result["campaign_id"] === "string" ? result["campaign_id"] : null;
 
   if (toolCall.name === "start_campaign" && campaignId) {
-    return <CampaignStatusPanel campaignId={campaignId} initial={result} live title="Campaign started" />;
+    return (
+      <CampaignStatusPanel campaignId={campaignId} initial={result} live title="Campaign started" />
+    );
   }
 
   if (toolCall.name === "get_campaign_status" && campaignId) {
@@ -48,9 +50,11 @@ export function ToolCallCard({
         {campaignId ? (
           <p className="mt-1 font-mono text-[11px] text-muted-foreground">{campaignId}</p>
         ) : null}
-        {error ? <div className="mt-2">
-          <ErrorNote message={error} />
-        </div> : null}
+        {error ? (
+          <div className="mt-2">
+            <ErrorNote message={error} />
+          </div>
+        ) : null}
       </CardFrame>
     );
   }
@@ -79,9 +83,11 @@ export function ToolCallCard({
             ))}
           </div>
         )}
-        {error ? <div className="mt-2">
-          <ErrorNote message={error} />
-        </div> : null}
+        {error ? (
+          <div className="mt-2">
+            <ErrorNote message={error} />
+          </div>
+        ) : null}
       </CardFrame>
     );
   }

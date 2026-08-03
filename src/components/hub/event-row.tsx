@@ -12,8 +12,16 @@ function SourceBadge({ source }: { source: string }) {
       className: "border-border bg-muted/40 text-muted-foreground",
       label: "chat",
     },
-    api: { icon: Terminal, className: "border-border bg-muted/40 text-muted-foreground", label: "api" },
-    system: { icon: Zap, className: "border-border bg-muted/40 text-muted-foreground", label: "system" },
+    api: {
+      icon: Terminal,
+      className: "border-border bg-muted/40 text-muted-foreground",
+      label: "api",
+    },
+    system: {
+      icon: Zap,
+      className: "border-border bg-muted/40 text-muted-foreground",
+      label: "system",
+    },
   };
   const entry = config[source] ?? {
     icon: Radio,
@@ -34,7 +42,13 @@ function SourceBadge({ source }: { source: string }) {
   );
 }
 
-export function EventRow({ event, showCampaign = true }: { event: HubEvent; showCampaign?: boolean }) {
+export function EventRow({
+  event,
+  showCampaign = true,
+}: {
+  event: HubEvent;
+  showCampaign?: boolean;
+}) {
   return (
     <div className="flex items-start justify-between gap-4 border-b border-border px-4 py-3 last:border-b-0">
       <div className="min-w-0">

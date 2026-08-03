@@ -52,44 +52,38 @@ export function ChatView() {
     if (!pending) textareaRef.current?.focus();
   }, [pending]);
 
-  const run = useCallback(
-    async (text: string, history: ChatMessage[]) => {
-      setPending(true);
-      setFailure(null);
-      const turns: ChatTurn[] = [
-        ...history,
-        { id: "pending", role: "user" as const, content: text },
-      ].map((message) => ({ role: message.role, content: message.content }));
-      const result = await sendChat(turns);
-      setPending(false);
+  const run = useCallback(async (text: string, history: ChatMessage[]) => {
+    setPending(true);
+    setFailure(null);
+    const turns: ChatTurn[] = [
+      ...history,
+      { id: "pending", role: "user" as const, content: text },
+    ].map((message) => ({ role: message.role, content: message.content }));
+    const result = await sendChat(turns);
+    setPending(false);
 
-      if (!result.ok) {
-        setFailure({ text, message: result.error });
-        return;
-      }
+    if (!result.ok) {
+      setFailure({ text, message: result.error });
+      return;
+    }
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `a-${Date.now()}`,
-          role: "assistant",
-          content: result.data.reply ?? "",
-          toolCalls: result.data.tool_calls ?? [],
-        },
-      ]);
-    },
-    [],
-  );
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `a-${Date.now()}`,
+        role: "assistant",
+        content: result.data.reply ?? "",
+        toolCalls: result.data.tool_calls ?? [],
+      },
+    ]);
+  }, []);
 
   const send = useCallback(
     (text: string) => {
       const trimmed = text.trim();
       if (!trimmed || pending) return;
       const history = messages;
-      setMessages((prev) => [
-        ...prev,
-        { id: `u-${Date.now()}`, role: "user", content: trimmed },
-      ]);
+      setMessages((prev) => [...prev, { id: `u-${Date.now()}`, role: "user", content: trimmed }]);
       setInput("");
       void run(trimmed, history);
     },

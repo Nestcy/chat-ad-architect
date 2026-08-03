@@ -92,7 +92,10 @@ function ImageGrid({
   return (
     <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
       {entries.map(([assetId, image]) => (
-        <div key={assetId} className="overflow-hidden rounded-md border border-border bg-background/40">
+        <div
+          key={assetId}
+          className="overflow-hidden rounded-md border border-border bg-background/40"
+        >
           {image?.url ? (
             <img
               src={image.url}
@@ -162,7 +165,7 @@ export function CampaignStatusPanel({ campaignId, initial, live = false, title }
 
   const status: CampaignStatus | undefined = useMemo(() => {
     if (data) return data;
-    if (initial && (initial['campaign_plan'] || initial['generated_images'] || initial['logs'])) {
+    if (initial && (initial["campaign_plan"] || initial["generated_images"] || initial["logs"])) {
       return initial as unknown as CampaignStatus;
     }
     return undefined;
@@ -271,7 +274,10 @@ export function CampaignStatusPanel({ campaignId, initial, live = false, title }
         <Section title="Agent log">
           <div className="max-h-40 overflow-y-auto rounded-md border border-border bg-background/60 p-2">
             {status.logs.map((line, index) => (
-              <p key={index} className="font-mono text-[10px] leading-relaxed text-muted-foreground">
+              <p
+                key={index}
+                className="font-mono text-[10px] leading-relaxed text-muted-foreground"
+              >
                 {line}
               </p>
             ))}
