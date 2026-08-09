@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AlertTriangle, ArrowUp, RotateCcw, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowUp, MessageSquarePlus, RotateCcw } from "lucide-react";
 import { sendChat, type ChatTurn, type ToolCall } from "@/lib/api";
 import { ToolCallCard } from "./tool-call-card";
 import { cn } from "@/lib/utils";
@@ -38,6 +38,7 @@ export function ChatView() {
   const [failure, setFailure] = useState<{ text: string; message: string } | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const runIdRef = useRef(0);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -53,6 +54,7 @@ export function ChatView() {
   }, [pending]);
 
   const run = useCallback(async (text: string, history: ChatMessage[]) => {
+    const runId = ++runIdRef.current;
     setPending(true);
     setFailure(null);
     const turns: ChatTurn[] = [
@@ -60,6 +62,7 @@ export function ChatView() {
       { id: "pending", role: "user" as const, content: text },
     ].map((message) => ({ role: message.role, content: message.content }));
     const result = await sendChat(turns);
+    if (runId !== runIdRef.current) return;
     setPending(false);
 
     if (!result.ok) {
@@ -77,6 +80,17 @@ export function ChatView() {
       },
     ]);
   }, []);
+
+  const newConversation = useCallback(() => {
+    runIdRef.current += 1;
+    setMessages([]);
+    setInput("");
+    setFailure(null);
+    setPending(false);
+    if (typeof window !== "undefined") window.localStorage.removeItem(STORAGE_KEY);
+    textareaRef.current?.focus();
+  }, []);
+
 
   const send = useCallback(
     (text: string) => {
@@ -201,13 +215,10 @@ export function ChatView() {
             <div className="flex items-center justify-between gap-2 px-2.5 pb-2.5">
               <button
                 type="button"
-                onClick={() => {
-                  setMessages([]);
-                  setFailure(null);
-                }}
+                onClick={newConversation}
                 className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
               >
-                <Trash2 className="size-3" /> New conversation
+                <MessageSquarePlus className="size-3" /> New conversation
               </button>
               <button
                 type="submit"
