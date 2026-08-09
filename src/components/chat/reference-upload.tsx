@@ -5,41 +5,47 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   campaignId: string;
-  assetId: string;
-  onUploaded: (assetId: string) => void;
+  /** Calendar date (YYYY-MM-DD) the reference photo belongs to. */
+  date: string;
+  onUploaded?: (date: string) => void;
+  label?: string;
+  compact?: boolean;
 };
 
-export function ReferenceUploadCard({ campaignId, assetId, onUploaded }: Props) {
+/** Shared drag-and-drop reference photo uploader for a single calendar day. */
+export function ReferenceDropZone({
+  campaignId,
+  date,
+  onUploaded,
+  label = "Drop an image here or click to choose a file",
+  compact = false,
+}: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [state, setState] = useState<"idle" | "uploading" | "done">("idle");
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
   const submit = useCallback(
     async (file: File | undefined | null) => {
       if (!file) return;
       setState("uploading");
       setError(null);
-      const result = await uploadReferenceImage(campaignId, assetId, file);
+      setPreview(URL.createObjectURL(file));
+      const result = await uploadReferenceImage(campaignId, date, file);
       if (!result.ok) {
         setState("idle");
         setError(result.error);
         return;
       }
       setState("done");
-      onUploaded(assetId);
+      onUploaded?.(date);
     },
-    [assetId, campaignId, onUploaded],
+    [campaignId, date, onUploaded],
   );
 
   return (
-    <div className="rounded-lg border border-warning/35 bg-warning/[0.06] p-3">
-      <div className="flex items-center gap-2 text-xs font-medium text-warning">
-        <ImagePlus className="size-3.5" />
-        This asset needs a real photo
-      </div>
-      <p className="mt-1 font-mono text-[11px] text-muted-foreground">{assetId}</p>
-
+    <div>
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
@@ -53,27 +59,39 @@ export function ReferenceUploadCard({ campaignId, assetId, onUploaded }: Props) 
           setDragging(false);
           void submit(event.dataTransfer.files?.[0]);
         }}
-        disabled={state !== "idle"}
+        disabled={state === "uploading"}
         className={cn(
-          "mt-3 flex w-full flex-col items-center gap-1.5 rounded-md border border-dashed border-border bg-background/40 px-3 py-4 text-xs text-muted-foreground transition-colors",
+          "flex w-full flex-col items-center gap-1.5 rounded-md border border-dashed border-border bg-background/40 text-xs text-muted-foreground transition-colors",
+          compact ? "px-2.5 py-3" : "px-3 py-5",
           dragging && "border-primary/60 bg-primary/5 text-foreground",
-          state === "idle" && "hover:border-primary/50 hover:text-foreground",
+          state !== "uploading" && "hover:border-primary/50 hover:text-foreground",
         )}
       >
         {state === "uploading" ? (
           <>
             <Loader2 className="size-4 animate-spin text-primary" />
-            Uploading and processing…
+            Uploading…
           </>
         ) : state === "done" ? (
-          <>Photo received — regenerating asset</>
+          <>
+            <ImagePlus className="size-4 text-success" />
+            Photo received
+          </>
         ) : (
           <>
             <Upload className="size-4" />
-            Drop an image here or click to choose a file
+            <span className="text-center leading-snug">{label}</span>
           </>
         )}
       </button>
+
+      {preview ? (
+        <img
+          src={preview}
+          alt={`Reference photo selected for ${date}`}
+          className="mt-2 aspect-video w-full rounded-md border border-border object-cover"
+        />
+      ) : null}
 
       {error ? <p className="mt-2 text-[11px] text-destructive">{error}</p> : null}
 

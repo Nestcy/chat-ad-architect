@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MessageSquare, Radio } from "lucide-react";
+import { ImagePlus, MessageSquare, Radio } from "lucide-react";
 import type { ReactNode } from "react";
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -25,6 +25,15 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             <MessageSquare className="size-3.5" />
             Chat
+          </Link>
+          <Link
+            to="/uploads"
+            activeProps={{ className: "bg-accent text-foreground" }}
+            inactiveProps={{ className: "text-muted-foreground hover:text-foreground" }}
+            className="flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
+          >
+            <ImagePlus className="size-3.5" />
+            Photos
           </Link>
           <Link
             to="/hub"
