@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AlertTriangle, ArrowUp, RotateCcw, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowUp, MessageSquarePlus, RotateCcw } from "lucide-react";
 import { sendChat, type ChatTurn, type ToolCall } from "@/lib/api";
 import { ToolCallCard } from "./tool-call-card";
 import { cn } from "@/lib/utils";
