@@ -38,6 +38,7 @@ export function ChatView() {
   const [failure, setFailure] = useState<{ text: string; message: string } | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const runIdRef = useRef(0);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
