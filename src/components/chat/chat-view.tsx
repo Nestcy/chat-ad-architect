@@ -54,6 +54,7 @@ export function ChatView() {
   }, [pending]);
 
   const run = useCallback(async (text: string, history: ChatMessage[]) => {
+    const runId = ++runIdRef.current;
     setPending(true);
     setFailure(null);
     const turns: ChatTurn[] = [
@@ -61,6 +62,7 @@ export function ChatView() {
       { id: "pending", role: "user" as const, content: text },
     ].map((message) => ({ role: message.role, content: message.content }));
     const result = await sendChat(turns);
+    if (runId !== runIdRef.current) return;
     setPending(false);
 
     if (!result.ok) {
@@ -78,6 +80,17 @@ export function ChatView() {
       },
     ]);
   }, []);
+
+  const newConversation = useCallback(() => {
+    runIdRef.current += 1;
+    setMessages([]);
+    setInput("");
+    setFailure(null);
+    setPending(false);
+    if (typeof window !== "undefined") window.localStorage.removeItem(STORAGE_KEY);
+    textareaRef.current?.focus();
+  }, []);
+
 
   const send = useCallback(
     (text: string) => {
