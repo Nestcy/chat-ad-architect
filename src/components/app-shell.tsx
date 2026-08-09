@@ -27,6 +27,15 @@ export function AppShell({ children }: { children: ReactNode }) {
             Chat
           </Link>
           <Link
+            to="/uploads"
+            activeProps={{ className: "bg-accent text-foreground" }}
+            inactiveProps={{ className: "text-muted-foreground hover:text-foreground" }}
+            className="flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
+          >
+            <ImagePlus className="size-3.5" />
+            Photos
+          </Link>
+          <Link
             to="/hub"
             activeProps={{ className: "bg-accent text-foreground" }}
             inactiveProps={{ className: "text-muted-foreground hover:text-foreground" }}
