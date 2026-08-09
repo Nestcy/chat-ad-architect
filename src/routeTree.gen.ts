@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UploadsRouteImport } from './routes/uploads'
 import { Route as HubIndexRouteImport } from './routes/hub.index'
 import { Route as HubCampaignIdRouteImport } from './routes/hub.$campaignId'
 import { Route as ApiProxySplatRouteImport } from './routes/api/proxy.$'
@@ -17,6 +18,11 @@ import { Route as ApiProxySplatRouteImport } from './routes/api/proxy.$'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UploadsRoute = UploadsRouteImport.update({
+  id: '/uploads',
+  path: '/uploads',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HubIndexRoute = HubIndexRouteImport.update({
@@ -37,12 +43,14 @@ const ApiProxySplatRoute = ApiProxySplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/uploads': typeof UploadsRoute
   '/hub/$campaignId': typeof HubCampaignIdRoute
   '/hub/': typeof HubIndexRoute
   '/api/proxy/$': typeof ApiProxySplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/uploads': typeof UploadsRoute
   '/hub/$campaignId': typeof HubCampaignIdRoute
   '/hub': typeof HubIndexRoute
   '/api/proxy/$': typeof ApiProxySplatRoute
@@ -50,20 +58,28 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/uploads': typeof UploadsRoute
   '/hub/$campaignId': typeof HubCampaignIdRoute
   '/hub/': typeof HubIndexRoute
   '/api/proxy/$': typeof ApiProxySplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/hub/$campaignId' | '/hub/' | '/api/proxy/$'
+  fullPaths: '/' | '/uploads' | '/hub/$campaignId' | '/hub/' | '/api/proxy/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/hub/$campaignId' | '/hub' | '/api/proxy/$'
-  id: '__root__' | '/' | '/hub/$campaignId' | '/hub/' | '/api/proxy/$'
+  to: '/' | '/uploads' | '/hub/$campaignId' | '/hub' | '/api/proxy/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/uploads'
+    | '/hub/$campaignId'
+    | '/hub/'
+    | '/api/proxy/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  UploadsRoute: typeof UploadsRoute
   HubCampaignIdRoute: typeof HubCampaignIdRoute
   HubIndexRoute: typeof HubIndexRoute
   ApiProxySplatRoute: typeof ApiProxySplatRoute
@@ -76,6 +92,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/uploads': {
+      id: '/uploads'
+      path: '/uploads'
+      fullPath: '/uploads'
+      preLoaderRoute: typeof UploadsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hub/': {
@@ -104,6 +127,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  UploadsRoute: UploadsRoute,
   HubCampaignIdRoute: HubCampaignIdRoute,
   HubIndexRoute: HubIndexRoute,
   ApiProxySplatRoute: ApiProxySplatRoute,
@@ -111,13 +135,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
