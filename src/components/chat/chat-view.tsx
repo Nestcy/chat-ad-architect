@@ -215,13 +215,10 @@ export function ChatView() {
             <div className="flex items-center justify-between gap-2 px-2.5 pb-2.5">
               <button
                 type="button"
-                onClick={() => {
-                  setMessages([]);
-                  setFailure(null);
-                }}
+                onClick={newConversation}
                 className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
               >
-                <Trash2 className="size-3" /> New conversation
+                <MessageSquarePlus className="size-3" /> New conversation
               </button>
               <button
                 type="submit"
