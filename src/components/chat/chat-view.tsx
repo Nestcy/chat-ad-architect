@@ -20,8 +20,10 @@ const SUGGESTIONS = [
 
 type Props = {
   onCampaignId?: (campaignId: string) => void;
+  onCampaignIds?: (campaignIds: string[]) => void;
   onPendingChange?: (pending: boolean) => void;
 };
+
 
 function toolLabel(toolCall: ToolCall) {
   const name = toolCall.name.replace(/_/g, " ");
