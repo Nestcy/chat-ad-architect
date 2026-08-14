@@ -31,7 +31,7 @@ function toolLabel(toolCall: ToolCall) {
   return { name, error };
 }
 
-export function ChatView({ onCampaignId, onPendingChange }: Props) {
+export function ChatView({ onCampaignId, onCampaignIds, onPendingChange }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [input, setInput] = useState("");
@@ -62,17 +62,24 @@ export function ChatView({ onCampaignId, onPendingChange }: Props) {
   }, [pending, onPendingChange]);
 
   useEffect(() => {
-    if (!onCampaignId) return;
-    for (const message of [...messages].reverse()) {
+    const seen: string[] = [];
+    let latest: string | null = null;
+    for (const message of messages) {
       for (const call of message.toolCalls ?? []) {
-        const id = call.result?.campaign_id;
-        if (typeof id === "string" && id.length > 0) {
-          onCampaignId(id);
-          return;
+        const single = call.result?.campaign_id;
+        if (typeof single === "string" && single.length > 0) {
+          latest = single;
+          if (!seen.includes(single)) seen.push(single);
+        }
+        for (const id of call.result?.campaign_ids ?? []) {
+          if (typeof id === "string" && id.length > 0 && !seen.includes(id)) seen.push(id);
         }
       }
     }
-  }, [messages, onCampaignId]);
+    if (seen.length > 0) onCampaignIds?.(seen);
+    if (latest) onCampaignId?.(latest);
+  }, [messages, onCampaignId, onCampaignIds]);
+
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
