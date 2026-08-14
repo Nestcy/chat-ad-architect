@@ -11,13 +11,25 @@ type Props = {
   date: string;
   day: CampaignDay | null | undefined;
   caption?: string | null;
+  variants?: unknown;
+  imagePrompt?: unknown;
   status?: string | null;
   onChanged?: () => void;
 };
 
-export function DayCard({ campaignId, date, day, caption, status, onChanged }: Props) {
-  const content = readDay(day, caption);
+export function DayCard({
+  campaignId,
+  date,
+  day,
+  caption,
+  variants,
+  imagePrompt,
+  status,
+  onChanged,
+}: Props) {
+  const content = readDay(day, caption, variants, imagePrompt);
   const state = readDayState(status, content.hasContent);
+
   const [showVariants, setShowVariants] = useState(false);
   const [tweakOpen, setTweakOpen] = useState(false);
   const [tweakText, setTweakText] = useState("");
