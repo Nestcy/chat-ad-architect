@@ -11,13 +11,25 @@ type Props = {
   date: string;
   day: CampaignDay | null | undefined;
   caption?: string | null;
+  variants?: unknown;
+  imagePrompt?: unknown;
   status?: string | null;
   onChanged?: () => void;
 };
 
-export function DayCard({ campaignId, date, day, caption, status, onChanged }: Props) {
-  const content = readDay(day, caption);
+export function DayCard({
+  campaignId,
+  date,
+  day,
+  caption,
+  variants,
+  imagePrompt,
+  status,
+  onChanged,
+}: Props) {
+  const content = readDay(day, caption, variants, imagePrompt);
   const state = readDayState(status, content.hasContent);
+
   const [showVariants, setShowVariants] = useState(false);
   const [tweakOpen, setTweakOpen] = useState(false);
   const [tweakText, setTweakText] = useState("");
@@ -42,24 +54,15 @@ export function DayCard({ campaignId, date, day, caption, status, onChanged }: P
     onChanged?.();
   }
 
-  if (state === "empty") {
-    return (
-      <article className="rounded-xl border border-border/60 border-l-2 border-l-border bg-card/50 px-5 py-5">
-        <p className="font-display text-sm text-muted-foreground">{formatDayDate(date)}</p>
-        <div className="mt-4 space-y-2.5">
-          <div className="h-2.5 w-2/3 rounded-full bg-muted/60" />
-          <div className="h-2.5 w-full rounded-full bg-muted/40" />
-          <div className="h-2.5 w-1/2 rounded-full bg-muted/30" />
-        </div>
-        <p className="mt-4 text-xs text-muted-foreground">Content not written yet.</p>
-      </article>
-    );
-  }
+  const empty = state === "empty";
 
   return (
     <article
       className={cn(
-        "rounded-xl border border-border/70 bg-card px-5 py-5 shadow-[0_18px_40px_-32px_rgba(0,0,0,0.9)]",
+        "rounded-xl border bg-card px-5 py-5",
+        empty
+          ? "border-border/60 bg-card/50"
+          : "border-border/70 shadow-[0_18px_40px_-32px_rgba(0,0,0,0.9)]",
         "border-l-2",
         state === "awaiting" ? "border-l-primary" : "border-l-border",
       )}
@@ -80,11 +83,27 @@ export function DayCard({ campaignId, date, day, caption, status, onChanged }: P
         <p className="mt-2 text-xs italic text-muted-foreground">{content.idea}</p>
       ) : null}
 
+      {empty ? (
+        <>
+          <div className="mt-4 space-y-2.5">
+            <div className="h-2.5 w-2/3 rounded-full bg-muted/60" />
+            <div className="h-2.5 w-full rounded-full bg-muted/40" />
+            <div className="h-2.5 w-1/2 rounded-full bg-muted/30" />
+          </div>
+          <p className="mt-4 text-xs text-muted-foreground">
+            Content not written yet — approve the plan to let the agent draft this day, or send a
+            note below to steer it.
+          </p>
+        </>
+      ) : null}
+
       {content.caption ? (
         <p className="mt-5 whitespace-pre-wrap text-[15px] leading-relaxed text-foreground">
           {content.caption}
         </p>
       ) : null}
+
+
 
       {content.variants.length > 0 ? (
         <div className="mt-5">

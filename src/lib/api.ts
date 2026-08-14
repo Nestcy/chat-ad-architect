@@ -55,16 +55,29 @@ export type CampaignDay = {
   [key: string]: unknown;
 };
 
+export type StrategyOutline = {
+  content_pillars?: string[] | null;
+  tone?: string | null;
+  platform_mix?: string | null;
+  notes?: string | null;
+  [key: string]: unknown;
+};
+
 export type CampaignStatus = {
   campaign_id: string;
   is_running?: boolean | null;
   plan_status?: PlanStatus | null;
+  strategy_outline?: StrategyOutline | null;
+  calendar_dates?: string[] | null;
   calendar_plan?: Record<string, CampaignDay> | null;
   generated_captions?: Record<string, string> | null;
+  ad_copy_variants?: Record<string, unknown> | null;
+  image_prompts?: Record<string, unknown> | null;
   generated_images?: Record<string, GeneratedImage> | null;
   asset_status?: Record<string, string> | null;
   logs?: string[] | null;
 };
+
 
 export type HubEvent = {
   id: number;

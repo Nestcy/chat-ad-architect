@@ -78,6 +78,13 @@ export function StrategySummaryCard({
         <p className="mt-3 text-sm leading-relaxed text-foreground/90">{strategy.summary}</p>
       ) : null}
 
+      {!strategy.hasAny ? (
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          The agent hasn't written a strategy outline for this campaign yet — you can still approve
+          the {dayCount > 0 ? `${dayCount}-day ` : ""}plan or request changes below.
+        </p>
+      ) : null}
+
       <div className="mt-5 space-y-4">
         {strategy.pillars.length > 0 ? (
           <div>
@@ -113,9 +120,15 @@ export function StrategySummaryCard({
                 <Chip key={platform}>{platform}</Chip>
               ))}
             </div>
+            {strategy.platformNote ? (
+              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                {strategy.platformNote}
+              </p>
+            ) : null}
           </div>
         ) : null}
       </div>
+
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <button
