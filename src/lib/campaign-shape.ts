@@ -55,14 +55,25 @@ export type DayContent = {
   hasContent: boolean;
 };
 
-export function readDay(day: CampaignDay | undefined | null, caption?: string | null): DayContent {
+export function readDay(
+  day: CampaignDay | undefined | null,
+  caption?: string | null,
+  extraVariants?: unknown,
+  extraImagePrompt?: unknown,
+): DayContent {
   const bag = (day ?? {}) as Bag;
   const resolvedCaption =
-    asString(caption) ?? asString(pick(bag, ["caption", "post_caption", "copy", "text"]));
-  const variants = asStringList(
-    pick(bag, ["ad_copy_variants", "ad_copy", "copy_variants", "variants", "ad_variants"]),
-  );
-  const imagePrompt = asString(pick(bag, ["image_prompt", "imagePrompt", "prompt", "visual_prompt"]));
+    asString(pick(bag, ["caption", "post_caption", "copy", "text"])) ?? asString(caption);
+  const variants = (() => {
+    const inline = asStringList(
+      pick(bag, ["ad_copy_variants", "ad_copy", "copy_variants", "variants", "ad_variants"]),
+    );
+    return inline.length > 0 ? inline : asStringList(extraVariants);
+  })();
+  const imagePrompt =
+    asString(pick(bag, ["image_prompt", "imagePrompt", "prompt", "visual_prompt"])) ??
+    asString(extraImagePrompt) ??
+    asString(pick((extraImagePrompt ?? {}) as Bag, ["prompt", "image_prompt", "text"]));
   const idea = asString(pick(bag, ["idea", "concept", "theme", "hook"]));
   const platform = asString(pick(bag, ["platform", "channel"]));
   return {
@@ -75,6 +86,17 @@ export function readDay(day: CampaignDay | undefined | null, caption?: string | 
     hasContent: Boolean(resolvedCaption || variants.length > 0 || imagePrompt),
   };
 }
+
+/** Dates come from calendar_dates while the plan is still a draft. */
+export function readDates(status: CampaignStatus | null | undefined): string[] {
+  const set = new Set<string>();
+  for (const date of status?.calendar_dates ?? []) {
+    if (typeof date === "string" && date.trim()) set.add(date.trim());
+  }
+  for (const date of Object.keys(status?.calendar_plan ?? {})) set.add(date);
+  return [...set].sort();
+}
+
 
 export type DayState = "empty" | "awaiting" | "approved" | "published";
 
