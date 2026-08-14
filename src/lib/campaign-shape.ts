@@ -112,37 +112,81 @@ export type Strategy = {
   pillars: string[];
   tone: string | null;
   platforms: string[];
+  platformNote: string | null;
   summary: string | null;
+  hasAny: boolean;
 };
+
+const KNOWN_PLATFORMS = [
+  "LinkedIn",
+  "Instagram",
+  "Facebook",
+  "TikTok",
+  "YouTube",
+  "Threads",
+  "Pinterest",
+  "Reddit",
+  "X (Twitter)",
+  "Twitter",
+  "X",
+];
+
+/** platform_mix arrives as prose ("LinkedIn and X daily, Instagram 2-3 times") — pull chips out of it. */
+function splitPlatforms(value: unknown): string[] {
+  if (Array.isArray(value)) return asStringList(value);
+  const text = asString(value);
+  if (!text) return [];
+  const found: string[] = [];
+  for (const name of KNOWN_PLATFORMS) {
+    if (found.some((item) => item.toLowerCase().includes(name.toLowerCase()))) continue;
+    if (new RegExp(`\\b${name.replace(/[()]/g, "\\$&")}`, "i").test(text)) found.push(name);
+  }
+  if (found.length > 0) return found;
+  return text
+    .split(/,|\band\b|\//i)
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0 && part.length <= 24)
+    .slice(0, 6);
+}
 
 export function readStrategy(status: CampaignStatus | null | undefined): Strategy {
   const bag = (status ?? {}) as unknown as Bag;
-  const nested = (pick(bag, ["strategy", "plan", "campaign_plan", "brief"]) ?? {}) as Bag;
+  const nested = (pick(bag, [
+    "strategy_outline",
+    "strategy",
+    "plan",
+    "campaign_plan",
+    "brief",
+  ]) ?? {}) as Bag;
   const pillars = asStringList(
     pick(bag, ["content_pillars", "pillars"]) ?? pick(nested, ["content_pillars", "pillars"]),
   );
   const tone =
-    asString(pick(bag, ["tone", "brand_tone", "voice"])) ??
-    asString(pick(nested, ["tone", "brand_tone", "voice"]));
-  const explicitPlatforms = asStringList(
-    pick(bag, ["platforms", "platform_mix", "channels"]) ??
-      pick(nested, ["platforms", "platform_mix", "channels"]),
-  );
+    asString(pick(nested, ["tone", "brand_tone", "voice"])) ??
+    asString(pick(bag, ["tone", "brand_tone", "voice"]));
+  const rawMix =
+    pick(nested, ["platform_mix", "platforms", "channels"]) ??
+    pick(bag, ["platform_mix", "platforms", "channels"]);
+  const explicitPlatforms = splitPlatforms(rawMix);
   const derived = new Set<string>();
   for (const day of Object.values(status?.calendar_plan ?? {})) {
     const platform = asString((day as Bag)["platform"]);
     if (platform) derived.add(platform);
   }
   const summary =
-    asString(pick(bag, ["strategy_summary", "summary", "goal", "objective"])) ??
-    asString(pick(nested, ["strategy_summary", "summary", "goal", "objective"]));
+    asString(pick(nested, ["notes", "strategy_summary", "summary", "goal", "objective"])) ??
+    asString(pick(bag, ["strategy_summary", "summary", "goal", "objective"]));
+  const platforms = explicitPlatforms.length > 0 ? explicitPlatforms : [...derived];
   return {
     pillars,
     tone,
-    platforms: explicitPlatforms.length > 0 ? explicitPlatforms : [...derived],
+    platforms,
+    platformNote: Array.isArray(rawMix) ? null : asString(rawMix),
     summary,
+    hasAny: pillars.length > 0 || Boolean(tone) || platforms.length > 0 || Boolean(summary),
   };
 }
+
 
 export function formatDayDate(date: string) {
   const parts = date.split("-").map((part) => Number(part));
